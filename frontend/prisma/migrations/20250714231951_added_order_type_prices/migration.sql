@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "PaperTradeOrder" ADD COLUMN     "limitPrice" DOUBLE PRECISION,
+ADD COLUMN     "stopPrice" DOUBLE PRECISION,
+ADD COLUMN     "trailPrice" DOUBLE PRECISION,
+ADD COLUMN     "trailRate" DOUBLE PRECISION,
+ALTER COLUMN "orderPrice" DROP NOT NULL;

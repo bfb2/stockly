@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  paperTradeAccount PaperTradeAccount?
+}
+
+model PaperTradeAccount {
+  id      String @id @default(cuid())
+  userID  String @unique
+  assets  Assets[]
+  balance Float
+  orders  PaperTradeOrder[]
+  user    User   @relation(fields: [userID], references: [id])
+}
+
+model PaperTradeOrder{
+  id Int @id @default(autoincrement())
+  paperTradeAccountId String 
+  ticker String 
+  orderType String
+  side String
+  qty Int
+  status String
+  submitted DateTime
+  dateLastChecked DateTime @default(now())
+  orderPrice Float?
+  assetId String?
+  stopPrice Float?
+  limitPrice Float?
+  trailRate Float?
+  trailPrice Float?
+  trailDollars Float?
+  asset Assets? @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  paperTradeAccount PaperTradeAccount @relation(fields: [paperTradeAccountId], references: [id])
+}
+
+model Assets{
+  id String @id @default(cuid())
+  ticker String
+  paperTradeAccountId String
+  qty Int
+  paperTradeAccount PaperTradeAccount @relation(fields: [paperTradeAccountId], references: [id])
+  paperTradeOrders PaperTradeOrder[] 
+  lastDividendDate DateTime
+}
+
+model MonthlyIndicatorData{
+  id  String @id @default("lei_pmi")
+  lei Json
+  ManufacturingPmi Json
+  servicesPmi Json
+}
