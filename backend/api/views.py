@@ -10,13 +10,14 @@ import traceback
 
 # Create your views here.
 class BacktracePortfolioAPIView(APIView):
-    def post(self, request):
-        serializer = BacktracePortfolioSerialzer(data = request.data)
+    def get(self, request):
+        serializer = BacktracePortfolioSerialzer(data = request.query_params)
         if serializer.is_valid():
-            portfolio_simulation = Backtrace(request.data['assets'], request.data['start_date'], request.data['end_date'], request.data['initial_amount'],
-                                             request.data['rebalancing'],request.data['leverage'], request.data['cashflows'], request.data['contribution_amount'], 
-                                             request.data['withdraw_amount'],request.data['withdraw_pct'], request.data['frequency'], request.data['expense_ratio'], 
-                                             request.data['reinvest_dividends'])
+            data = serializer.validated_data
+            portfolio_simulation = Backtrace(data['tickers'],data['allocations'], data['start_date'], data['end_date'], data['initial_amount'],
+                                             data['rebalancing'],data['leverage'], data['cashflows'], data['contribution_amount'], 
+                                             data['withdraw_amount'],data['withdraw_pct'], data['frequency'], data['expense_ratio'], 
+                                             data['reinvest_dividends'])
             try:
                 portfolio_simulation.calculate_portfolio_growth()
                 portfolio_simulation.calculate_portfolio_stats()

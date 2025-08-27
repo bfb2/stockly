@@ -57,13 +57,13 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} dark antialiased grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] h-[100vh]`}
       >
         
-          <header className="pr-1.5 pt-2">
+          <header className="pr-1.5 pt-2 flex justify-end">
             {session ? 
               <form action={logoutAction}>
-                <button type="submit" className="flex px-2.5 py-0.75 rounded-2xl border-1 border-white justify-self-end cursor-pointer gap-x-1">Sign out</button> 
+                <button type="submit" className="flex px-2.5 py-0.75 w-fit rounded-2xl border-1 border-white justify-self-end cursor-pointer gap-x-1">Sign out</button> 
               </form>
               :
-              <Link href={'/signin'} className="flex px-2.5 py-0.75 rounded-2xl border-1 border-white justify-self-end cursor-pointer gap-x-1"><span>Sign in</span> <UserCircleIcon size={20} className="center-pos"/></Link>}
+              <Link href={'/signin'} className="flex px-2.5 py-0.75 rounded-2xl w-fit border-1 border-white justify-self-end cursor-pointer gap-x-1"><span>Sign in</span> <UserCircleIcon size={20} className="center-pos"/></Link>}
           </header>
           <nav className="bg-[#0f1527] text-white px-2 w-fit h-full  col-1 row-[1/-1] justify-center grid grid-rows-[40px_1fr]">
             <ul className="justify-items-center flex flex-col row-2">

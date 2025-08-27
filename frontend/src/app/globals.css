@@ -123,7 +123,8 @@
 
 .center-pos{
   justify-self: anchor-center;
-  align-self: anchor-center
+  align-self: anchor-center;
+  align-self: center;
 }
 
 .gray-outline-btn{

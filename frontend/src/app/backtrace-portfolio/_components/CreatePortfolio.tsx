@@ -69,6 +69,24 @@ const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:Return
         }
     })
 
+    const contructTickersAllocationUrl = () => {
+        const assets = Object.values(portfolioSettings.temp)
+        let allocationsUrl = ''
+        let tickers = ''
+        assets.forEach(({ticker, allocations}) =>{
+            tickers += `tickers=${ticker}&`
+            let allocationString = 'allocations='
+            allocations.forEach((allocation, index) => {
+                if(index == 2)
+                    allocationString += `${allocation}&`
+                else
+                    allocationString += `${allocation},`
+            })
+            allocationsUrl+= allocationString
+        })
+        return {tickers, allocationsUrl}
+    }
+
     const calcMonthNum = (month:number) => {
         if(month < 9)
             return String(month+1).padStart(2, '0')
@@ -86,26 +104,11 @@ const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:Return
         
         const startMonthNum  = calcMonthNum(months.indexOf(startMonth))
         const endMonthNum = calcMonthNum(months.indexOf(endMonth))
-         fetch('http://127.0.0.1:8000/backtrace-portfolio', {
-            method:'POST',
+        const {tickers, allocationsUrl} = contructTickersAllocationUrl()
+         fetch(`http://127.0.0.1:8000/backtrace-portfolio?start_date=${startYear}-${startMonthNum}-01&end_date=${endYear}-${endMonthNum}-${findLastDay(endYear, Number(endMonthNum))}&initial_amount=${initial_amount}&rebalancing=${rebalancing}&leverage=${leverage}&${tickers}${allocationsUrl}frequency=${frequency}&cashflows=${cashflows}&contribution_amount=${contributionAmount}&withdraw_amount=${withdrawAmount}&withdraw_pct=${withdrawPercentage}&reinvest_dividends=${dividends}&expense_ratio=${expenseRatio}`, {
+            method:'GET',
             headers:{"Content-Type":'application/json'},
-            body:JSON.stringify({
-                start_date:`${startYear}-${startMonthNum}-1`,
-                end_date:`${endYear}-${endMonthNum}-${findLastDay(endYear, Number(endMonthNum))}`,
-                initial_amount,
-                rebalancing,
-                leverage,
-                assets:portfolioSettings.temp,
-                frequency,
-                cashflows,
-                contribution_amount:contributionAmount,
-                withdraw_amount:withdrawAmount,
-                withdraw_pct:withdrawPercentage,
-                reinvest_dividends:dividends, 
-                expense_ratio:expenseRatio
-            })
         }).then(res => res.json()).then((portfolios:ReturnedPortfolioData)=> {
-               console.log(portfolios);
                 setLoading(false)
                 setGrowthData({
                     growth:portfolios.growth, 
@@ -197,9 +200,9 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
     }
 
     const updatePortfolioField = (e:React.FormEvent<HTMLInputElement>, field:keyof PortfolioSettings['settings'])=> {
-        
-        if(!isNaN(Number(e.currentTarget.value)))
-            setPortfolioSettings(prev => ({...prev, data:{...prev.data, settings:{...prev.data.settings, [field]:e.currentTarget.value}}}))
+        const input = e.currentTarget.value
+        if(!isNaN(Number(input)))
+            setPortfolioSettings(prev => ({...prev, data:{...prev.data, settings:{...prev.data.settings, [field]:input}}}))
     }
 
     const updateStockSelected = (row:number, stockData:QueryResult) => {
@@ -251,9 +254,9 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
                                 <span className="flex gap-1.5 items-center w-[100px]">{`Asset ${row+1}`} {row == assets -1 && <PlusCircleIcon className="cursor-pointer" onClick={()=>setAssets(prev => prev+5)}/>}</span>
                                 <SearchInput placeholder="Ticker symbol"  getSelection={(stockData:QueryResult)=>updateStockSelected(row, stockData)} value={portfolioSettings.temp?.[row]?.ticker}  />
                             </div>
-                            <div className="col-2"><Input onKeydown={e => updateAllocation(row,0,e)} value={portfolioSettings.temp?.[row]?.allocations?.[0] == 0 ? '' : portfolioSettings.temp?.[row]?.allocations?.[0]} />&nbsp;&nbsp;%</div>
-                            <div className="col-3"><Input onKeydown={e => updateAllocation(row,1,e)} value={portfolioSettings.temp?.[row]?.allocations?.[1] == 0 ? '' : portfolioSettings.temp?.[row]?.allocations?.[1]} />&nbsp;&nbsp;%</div>
-                            <div className="col-4"><Input onKeydown={e => updateAllocation(row,2,e)}  value={portfolioSettings.temp?.[row]?.allocations?.[2] == 0 ? '' : portfolioSettings.temp?.[row]?.allocations?.[2]} />&nbsp;&nbsp;%</div>
+                            <div className="col-2"><Input onInput={e => updateAllocation(row,0,e)} value={portfolioSettings.temp?.[row]?.allocations?.[0] == 0 ? '' : portfolioSettings.temp?.[row]?.allocations?.[0]} />&nbsp;&nbsp;%</div>
+                            <div className="col-3"><Input onInput={e => updateAllocation(row,1,e)} value={portfolioSettings.temp?.[row]?.allocations?.[1] == 0 ? '' : portfolioSettings.temp?.[row]?.allocations?.[1]} />&nbsp;&nbsp;%</div>
+                            <div className="col-4"><Input onInput={e => updateAllocation(row,2,e)}  value={portfolioSettings.temp?.[row]?.allocations?.[2] == 0 ? '' : portfolioSettings.temp?.[row]?.allocations?.[2]} />&nbsp;&nbsp;%</div>
 
                         </React.Fragment>
                     )}
@@ -273,19 +276,19 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
                             <option className="bg-[#2b3755]" value={'Year-to-Year'}>Year-to-Year</option>
                         </select>
                     }/>
-                    <LabelAndItem label="Start Year" item={<Input value={portfolioSettings.data.settings.startYear} onKeydown={(e)=>updatePortfolioField(e, 'startYear')}/>}/>
+                    <LabelAndItem label="Start Year" item={<Input value={portfolioSettings.data.settings.startYear} onInput={(e)=>updatePortfolioField(e, 'startYear')}/>}/>
                     {portfolioSettings.data.settings.timePeriod == 'Month-to-Month' && 
                         <LabelAndItem label="First Month" item={<select onChange={e => onSelectChange(e,'startMonth' )} defaultValue={portfolioSettings.data.settings.startMonth}>
                             {months.map(month => <option key={month} className="bg-[#2b3755]" value={month}>{month}</option>)}
                         </select>}/>
                     }
-                    <LabelAndItem label="End Year" item={<Input onKeydown={(e)=>updatePortfolioField(e, 'endYear')} value={portfolioSettings.data.settings.endYear}/>}/>
+                    <LabelAndItem label="End Year" item={<Input onInput={(e)=>updatePortfolioField(e, 'endYear')} value={portfolioSettings.data.settings.endYear}/>}/>
                     {portfolioSettings.data.settings.timePeriod == 'Month-to-Month' && 
                         <LabelAndItem label="Last Month" item={<select onChange={e => onSelectChange(e,'endMonth' )} defaultValue={portfolioSettings.data.settings.endMonth}>
                             {months.map(month => <option key={month} className="bg-[#2b3755]" value={month}>{month}</option>)}
                         </select>}/>
                     }
-                    <LabelAndItem label="Initial Amount" item={<Input value={portfolioSettings.data.settings.initial_amount} onKeydown={(e)=>updatePortfolioField(e, 'initial_amount')}/>}/>
+                    <LabelAndItem label="Initial Amount" item={<Input value={portfolioSettings.data.settings.initial_amount} onInput={(e)=>updatePortfolioField(e, 'initial_amount')}/>}/>
                     <LabelAndItem label="Cashflows" item={
                         <select onChange={e => onSelectChange(e, 'cashflows')} defaultValue={portfolioSettings.data.settings.cashflows}>
                             <option className="bg-[#2b3755]" value={'None'}>None</option>
@@ -296,15 +299,15 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
                     }/>
                     {
                         portfolioSettings.data.settings.cashflows == 'Contribute fixed amount' && 
-                        <LabelAndItem label="Contribution Amount" item={<Input value={portfolioSettings.data.settings.contributionAmount} onKeydown={e => updatePortfolioField(e, 'contributionAmount')}/>}/>
+                        <LabelAndItem label="Contribution Amount" item={<Input value={portfolioSettings.data.settings.contributionAmount} onInput={e => updatePortfolioField(e, 'contributionAmount')}/>}/>
                     }
                     {
                         portfolioSettings.data.settings.cashflows == 'Withdraw fixed amount' && 
-                        <LabelAndItem label="Withdrawal Amount" item={<Input value={portfolioSettings.data.settings.withdrawAmount} onKeydown={e => updatePortfolioField(e, 'withdrawAmount')}/>}/>
+                        <LabelAndItem label="Withdrawal Amount" item={<Input value={portfolioSettings.data.settings.withdrawAmount} onInput={e => updatePortfolioField(e, 'withdrawAmount')}/>}/>
                     }
                     {
                         portfolioSettings.data.settings.cashflows == 'Withdraw fixed percentage' &&
-                        <LabelAndItem label="Withdraw Fixed Percentage" item={<Input value={portfolioSettings.data.settings.withdrawPercentage} onKeydown={e => updatePortfolioField(e, 'withdrawPercentage')}/>}/>
+                        <LabelAndItem label="Withdraw Fixed Percentage" item={<Input value={portfolioSettings.data.settings.withdrawPercentage} onInput={e => updatePortfolioField(e, 'withdrawPercentage')}/>}/>
                     }
                     {
                         (portfolioSettings.data.settings.cashflows == 'Withdraw fixed percentage' || portfolioSettings.data.settings.cashflows == 'Withdraw fixed amount' || portfolioSettings.data.settings.cashflows == 'Contribute fixed amount') &&
@@ -324,7 +327,7 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
                             <option className="bg-[#2b3755]" value={'Rebalance monthly'}>Rebalance monthly</option>
                         </select>
                     }/>
-                    <LabelAndItem label="Leverage Amount" item={<Input value={portfolioSettings.data.settings.leverage} onKeydown={(e)=>updatePortfolioField(e, 'leverage')}/>}/>
+                    <LabelAndItem label="Leverage Amount" item={<Input value={portfolioSettings.data.settings.leverage} onInput={(e)=>updatePortfolioField(e, 'leverage')}/>}/>
                     <LabelAndItem label="Reinvest Dividends" item={
                         <select name="dividends" onChange={e => onSelectChange(e, 'dividends')} defaultValue={portfolioSettings.data.settings.dividends ? 'Yes':'No'}>
                             <option className="bg-[#2b3755]" >Yes</option>
@@ -334,7 +337,7 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
                     
                     <LabelAndItem label="Expense Ratio" item={
                         <div className="flex gap-x-1.25">
-                            <Input value={portfolioSettings.data.settings.expenseRatio} onKeydown={e => updatePortfolioField(e, 'expenseRatio')}/>
+                            <Input value={portfolioSettings.data.settings.expenseRatio} onInput={e => updatePortfolioField(e, 'expenseRatio')}/>
                             <span className="self-center">%</span>
                         </div>}/>
                 

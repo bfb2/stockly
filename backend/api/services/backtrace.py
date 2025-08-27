@@ -8,10 +8,9 @@ from itertools import islice
 from collections import defaultdict
 
 class Backtrace():
-    def __init__(self, assets, start_date,end_date,initial_amount,rebalancing,leverage,cashflows,contribution_amount,
+    def __init__(self, tickers, allocations, start_date,end_date,initial_amount,rebalancing,leverage,cashflows,contribution_amount,
                  withdraw_amount,withdraw_pct,frequency,expense_ratio, reinvest_dividends):
-        self.tickers = []
-        self.allocations = []
+        self.tickers = tickers
         self.portfolio_info = [{},{},{}]
         self.start_date = start_date
         self.end_date = end_date
@@ -33,13 +32,11 @@ class Backtrace():
             {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}}
         ]
 
-        for data in assets.values():
-                if not all(allocation == 0 for allocation in data['allocations']):
-                    self.tickers.append(data['ticker']) 
-                    self.allocations.append(data['allocations'])
-                    for portfolio_num, allocation in enumerate(data['allocations']):
-                        if allocation != 0:
-                            self.portfolio_info[portfolio_num][data['ticker']] = allocation
+        for index, ticker in enumerate(tickers):
+            for portfolio_num, allocation in enumerate(allocations[index]):
+                if allocation != 0:
+                    self.portfolio_info[portfolio_num][ticker] = allocation
+
 
                     
     def calculate_growth_between_dates(self, beginning_date, end_date, portfolio):
@@ -50,7 +47,7 @@ class Backtrace():
         return ((end - beginning) / beginning) * 100
 
     def calculate_portfolio_growth(self):
-        stock_data = retrieve_from_yf(datetime.strptime(self.start_date,"%Y-%m-%d"), datetime.strptime(self.end_date,"%Y-%m-%d"), self.tickers)        
+        stock_data = retrieve_from_yf(self.start_date, self.end_date, self.tickers)        
         stock_prices = stock_data['Adj Close'] if self.reinvest_dividends else stock_data['Close'] 
         stock_dividends = stock_data['Dividends']
         daily_er_fee = (float(self.expense_ratio)/100) / 252

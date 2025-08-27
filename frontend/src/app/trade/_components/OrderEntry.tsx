@@ -116,7 +116,7 @@ const OrderEntry = ({socketConnection, stockInfo, buyingPower, updateAccountData
         <span className="text-right">{stockPrice || '-'}</span>
         
         <LabelAndItem label="Order Type" item={<Dropdown options={orderTypes} onSelection={(e)=>updateOrderDetails(e, 'orderType')}/>} extraClass="mr-2"/>
-        <LabelAndItem label="Quantity" item={<Input value={orderDetails.quantity} onKeydown={(e)=>
+        <LabelAndItem label="Quantity" item={<Input value={orderDetails.quantity} onInput={(e)=>
             setOrderDetails(prev => (
                 {...prev, 
                 'quantity':Number(e.currentTarget.value)
@@ -124,10 +124,10 @@ const OrderEntry = ({socketConnection, stockInfo, buyingPower, updateAccountData
                 ))}/>}/>
         
         {(orderDetails.orderType == 'Limit' || orderDetails.orderType == 'Stop') && 
-            <LabelAndItem label={`${orderDetails.orderType} Price`} item={<Input onKeydown={e => updateOrderTypeDetails(e.currentTarget.value, orderDetails.orderType as "Limit"|'Stop')}/>} extraClass="col-[1/-1]"/>
+            <LabelAndItem label={`${orderDetails.orderType} Price`} item={<Input onInput={e => updateOrderTypeDetails(e.currentTarget.value, orderDetails.orderType as "Limit"|'Stop')}/>} extraClass="col-[1/-1]"/>
         }
-        {orderDetails.orderType == 'Stop Limit' && <LabelAndItem label="Stop Price" item={<Input onKeydown={e => updateOrderTypeDetails(e.currentTarget.value, 'Stop')}/>} extraClass="mr-1.5"/>}
-        {orderDetails.orderType == 'Stop Limit' && <LabelAndItem label="Limit Price" item={<Input onKeydown={e => updateOrderTypeDetails(e.currentTarget.value, 'Limit')}/>}/>}
+        {orderDetails.orderType == 'Stop Limit' && <LabelAndItem label="Stop Price" item={<Input onInput={e => updateOrderTypeDetails(e.currentTarget.value, 'Stop')}/>} extraClass="mr-1.5"/>}
+        {orderDetails.orderType == 'Stop Limit' && <LabelAndItem label="Limit Price" item={<Input onInput={e => updateOrderTypeDetails(e.currentTarget.value, 'Limit')}/>}/>}
         {orderDetails.orderType == 'Trailing Stop' && 
             <div className="col-[1/-1]">
                 <input type="radio" checked={trailType == 'rate'} onClick={()=>setTrailType('rate')}/>

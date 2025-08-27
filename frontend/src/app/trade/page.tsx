@@ -1,5 +1,6 @@
 import {headers} from 'next/headers'
 import PaperTrade from "./_components/PaperTrade"
+import { PaperTradeAccInfo } from '@/types'
 
 const page = async () =>{
     const headerStore = await headers()
@@ -9,7 +10,8 @@ const page = async () =>{
             cookie:headerStore.get('cookie')|| ''
         }
     })
-    const data = await res.json()
+    const data:PaperTradeAccInfo = await res.json() 
+    
     return <PaperTrade data={data}/>
 } 
 
