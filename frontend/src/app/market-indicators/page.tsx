@@ -48,7 +48,7 @@ const Page = () =>{
             setStockData({...e.data})
             worker.terminate()
         }
-        fetch('http://127.0.0.1:8000/market-analysis').then(res => res.json()).then(data => worker.postMessage(data))
+        fetch('https://stockly-fvoz.onrender.com/market-analysis').then(res => res.json()).then(data => worker.postMessage(data))
     },[]) 
         
     return <main className="relative grid-cols-2 grid-rows-[50px_1fr_1fr_1fr_50px_1fr_1fr] grid">

@@ -5,7 +5,7 @@ export const GET = async (req:Request) => {
     if(!token)
         return Response.json({error:'Not logged in'},{status:401})
     
-    const res = await fetch('http://127.0.0.1:8000/paper-trade', {
+    const res = await fetch('https://stockly-fvoz.onrender.com/paper-trade', {
         headers:{
             Authorization:`Bearer ${token}`
         }

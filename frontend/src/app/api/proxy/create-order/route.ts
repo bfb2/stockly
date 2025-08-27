@@ -8,7 +8,7 @@ export const POST = async (req:Request) => {
 
     try {
         const body = await req.json()
-        const res = await fetch('http://127.0.0.1:8000/create-order', {
+        const res = await fetch('https://stockly-fvoz.onrender.com/create-order', {
             method:'POST',
             headers:{
                 Authorization:`Bearer ${token}`,

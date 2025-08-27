@@ -105,7 +105,7 @@ const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:Return
         const startMonthNum  = calcMonthNum(months.indexOf(startMonth))
         const endMonthNum = calcMonthNum(months.indexOf(endMonth))
         const {tickers, allocationsUrl} = contructTickersAllocationUrl()
-         fetch(`http://127.0.0.1:8000/backtrace-portfolio?start_date=${startYear}-${startMonthNum}-01&end_date=${endYear}-${endMonthNum}-${findLastDay(endYear, Number(endMonthNum))}&initial_amount=${initial_amount}&rebalancing=${rebalancing}&leverage=${leverage}&${tickers}${allocationsUrl}frequency=${frequency}&cashflows=${cashflows}&contribution_amount=${contributionAmount}&withdraw_amount=${withdrawAmount}&withdraw_pct=${withdrawPercentage}&reinvest_dividends=${dividends}&expense_ratio=${expenseRatio}`, {
+         fetch(`https://stockly-fvoz.onrender.com/backtrace-portfolio?start_date=${startYear}-${startMonthNum}-01&end_date=${endYear}-${endMonthNum}-${findLastDay(endYear, Number(endMonthNum))}&initial_amount=${initial_amount}&rebalancing=${rebalancing}&leverage=${leverage}&${tickers}${allocationsUrl}frequency=${frequency}&cashflows=${cashflows}&contribution_amount=${contributionAmount}&withdraw_amount=${withdrawAmount}&withdraw_pct=${withdrawPercentage}&reinvest_dividends=${dividends}&expense_ratio=${expenseRatio}`, {
             method:'GET',
             headers:{"Content-Type":'application/json'},
         }).then(res => res.json()).then((portfolios:ReturnedPortfolioData)=> {
