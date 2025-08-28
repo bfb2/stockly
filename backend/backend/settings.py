@@ -100,11 +100,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'stockly_db',
-        'USER':'postgres',
-        'PASSWORD':'123',
-        'HOST':'localhost',
-        'PORT':'5432'
+        'NAME': os.getenv('NEON_DB_NAME'),
+        'USER': os.getenv('NEON_DB_USER'),
+        'PASSWORD': os.getenv('NEON_DB_PASSWORD'),
+        'HOST': os.getenv('NEON_DB_HOST'),
+        'PORT': os.getenv('NEON_DB_PORT'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 
