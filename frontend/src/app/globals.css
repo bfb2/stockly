@@ -124,7 +124,14 @@
 .center-pos{
   justify-self: anchor-center;
   align-self: anchor-center;
-  align-self: center;
+}
+
+@supports (-moz-appearance: none){
+  .center-pos{
+    top: 50%;
+    transform: translateY(-50%);
+    justify-self: center;
+  }
 }
 
 .gray-outline-btn{

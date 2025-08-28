@@ -168,7 +168,7 @@ const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:Return
 
 const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfolioSettings:PortfolioState, setPortfolioSettings:React.Dispatch<React.SetStateAction<PortfolioState>>}) => {
     const [page, setPage] = useState({assets:true, settings:false})
-    const [assets, setAssets] = useState(10)
+    const [assets, setAssets] = useState(5)
     const activeBtnClass = ' border-gray-500  relative border-b-[#2b3755] top-[1px]'
     const inactiveClass = 'border-transparent hover:border-gray-500'
     const assetKeys = Object.keys(portfolioSettings.temp)
@@ -243,7 +243,7 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
                 <button onClick={()=>setPage({assets:true, settings:false})} className={`cursor-pointer border-1 border-[#2b3755]  rounded-tr-lg top-[1px] rounded-tl-lg  relative px-2.5 py-1.5 ml-[0.5px] ${page.assets ? activeBtnClass : inactiveClass}`}>Portfolio Assets</button>
             </div>
             {page.assets ? 
-                <div className="grid grid-cols-[2fr_1fr_1fr_1fr]  auto-rows-auto gap-3.75 mb-5 ">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr] pb-1.25 h-[300px] overflow-auto scrollbar auto-rows-auto gap-3.75 mb-5 ">
                     <div className="col-2 row-1">Portfolio #1</div>
                     <div className="col-3 row-1">Portfolio #2</div>
                     <div className="col-4 row-1">Portfolio #3</div>
@@ -269,7 +269,7 @@ const ConfigurePortfolio = ({ setPortfolioSettings, portfolioSettings}:{portfoli
 
                 </div>
             :
-                <form className={`w-[1159px] max-w-[100vw] ${heightClass} mb-5`} id="portfolio-settings" >
+                <form className={`w-[1159px] max-w-[100vw] h-[300px] overflow-auto scrollbar mb-5`} id="portfolio-settings" >
                     <LabelAndItem label="Time Period" item={
                         <select name="time period" onChange={(e)=>onSelectChange(e, 'timePeriod')} defaultValue={portfolioSettings.data.settings.timePeriod}>
                             <option className="bg-[#2b3755]" value={'Month-to-Month'}>Month-to-Month</option>
