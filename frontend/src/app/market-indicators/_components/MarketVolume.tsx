@@ -1,6 +1,7 @@
 'use client'
 import ReactApexChart from 'react-apexcharts'
 import {ApexOptions} from 'apexcharts'
+import Label from './Label'
 
 const MarketVolume = ({volume, dates}:{volume:number[], dates:string[]}) =>{
     const options:ApexOptions = {
@@ -21,11 +22,7 @@ const MarketVolume = ({volume, dates}:{volume:number[], dates:string[]}) =>{
                   dataLabels: {
                     enabled: false
                   },
-                  title: {
-                    text: 'S&P Volume',
-                    align: 'left',
-                    offsetX: 110
-                  },
+                 
                   xaxis: {
                     categories: dates,
                     tickAmount:25
@@ -54,7 +51,11 @@ const MarketVolume = ({volume, dates}:{volume:number[], dates:string[]}) =>{
                   data: volume
                 }]
 
-    return <ReactApexChart options={options} series={series} type='bar' height={350} width={'100%'}/>
+    return <div className='row-[10-12] xl:row-[4/6] xl:col-2'>
+      <Label label='S&P Volume'/>
+      <ReactApexChart options={options} series={series} type='bar' height={200} width={'100%'}/>
+    </div>
+    
       
 } 
 

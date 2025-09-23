@@ -23,7 +23,6 @@ const StockPriceCandle = ({socketConnection, stockInfo, updateStockInfo}:
             } 
             
             fetch(`/api/bars/${stockInfo.new}`).then(res => res.json()).then((data:ReturnedAlphaAdvantageBarData) => {
-                console.log('bars', data)
                 const keys = Object.keys(data)
                 const transformedData = keys.map(key => (
                     {

@@ -5,7 +5,8 @@ import MACDChart from "./_components/MACDChart"
 import MarketVolume from "./_components/MarketVolume"
 import FullscreenLoader from "@/components/FullscreenLoader"
 import { MarketInfo } from "@/types"
-import LineChart from "@/components/LineChart"
+import LineChart from "./_components/LineChart"
+import AISummary from "./_components/AISummary"
 
 
 const Page = () =>{
@@ -39,27 +40,32 @@ const Page = () =>{
         PCEPILFE:{data:[], dates:[]}, 
         lei:{data:[],months:[]}, 
         manufacturingpmi:[], 
-        servicespmi:{data:[],months:[]}
+        servicespmi:{data:[],months:[]},
+        marketSummary:'',
+        econSummary:''
     })
 
-    useEffect(()=>{
+     useEffect(()=>{
         const worker = new Worker('/workers/fredWorker.js')
         worker.onmessage = e => {
             setStockData({...e.data})
             worker.terminate()
         }
         fetch('https://stockly-fvoz.onrender.com/market-analysis').then(res => res.json()).then(data => worker.postMessage(data))
-    },[]) 
+    },[])   
         
-    return <main className="relative grid-cols-2 grid-rows-[50px_1fr_1fr_1fr_50px_1fr_1fr] grid">
-        <FullscreenLoader displaySpinner={stockData.closePrices.length ==0}/>
-        <div className="col-[1/-1] text-2xl font-bold">Market Stats</div>
-        <MovingAverages data={stockData.movingAverage} stockPrices={stockData.closePrices} dates={stockData.dates} />
+    return <main  className="relative xl:grid-cols-2 grid-rows-[repeat(20, minmax(0,1fr))] grid gap-x-[5px]">
+        <FullscreenLoader displaySpinner={false}/>
+        <div className="col-[1/-1] text-2xl font-bold w-fit relative left-[15px] mb-[15px]">Market Stats</div>
+        <AISummary rowClass="row-[2/6]" summary={stockData.marketSummary}/>      
+        <MovingAverages  data={stockData.movingAverage} stockPrices={stockData.closePrices} dates={stockData.dates} />
         <MarketVolume volume={stockData.volume} dates ={stockData.dates}/>
-        <LineChart xaxis={stockData.dates} title="RSI" series={[{name:'RSI', data:stockData.rsi}]}/>
+
+        <LineChart xaxis={stockData.dates}  title="RSI" series={[{name:'RSI', data:stockData.rsi}]}/>
         <LineChart series={[{name:'VIX', data:stockData.vix}]} xaxis={stockData.dates} title="VIX"/>
         <MACDChart dates={stockData.dates} data={stockData.macd}/>
-        <div className="col-[1/-1] text-2xl font-bold">Economic Stats</div>
+        <div className="col-[1/-1] text-2xl font-bold w-fit relative left-[15px] mb-[15px]">Economic Stats</div>
+        <AISummary rowClass="row-[25-29] xl:row-[9/13]" summary={stockData.econSummary}/>   
         <LineChart series={[
             {
                 data:stockData.T10Y2Y.data, 
@@ -71,8 +77,10 @@ const Page = () =>{
             }]} 
             xaxis={stockData.T10Y2Y.dates} 
             title="Interest Rate Spreads"
+            rowClass="row-[30-32] xl:row-[9/11]"
         />
         <LineChart 
+            rowClass="row-[33-35] xl:row-[11/13]"
             series={
                 [
                     {
@@ -89,7 +97,7 @@ const Page = () =>{
         />
         <LineChart series={[{data:stockData.IC4WSA.data, name:'Claims'}]} xaxis={stockData.IC4WSA.dates} title="Unemployment Initial Claims, 4-Week Moving Average"/>
         <LineChart series={[{data:stockData.CCSA.data, name:'Claims'}]} xaxis={stockData.CCSA.dates} title="Continued Claims, Seasonally Adjusted"/>
-        <LineChart 
+        <LineChart
             series={
                 [
                     {
@@ -99,7 +107,14 @@ const Page = () =>{
                     {
                         data:stockData.CPILFESL.data, 
                         name:'Core CPI'
-                    },
+                    }
+                ]} 
+                xaxis={stockData.CPIAUCSL.dates} 
+                title="Inflation (CPI)"
+        />
+        <LineChart
+            series={
+                [
                     {
                         data:stockData.PCEPI.data,
                         name:'PCE'
@@ -109,8 +124,8 @@ const Page = () =>{
                         name:'Core PCE'
                     }
                 ]} 
-                xaxis={stockData.CPIAUCSL.dates} 
-                title="Inflation"
+                xaxis={stockData.PCEPI.dates} 
+                title="Inflation (PCE)"
         />
         <LineChart  title="U.S.A L.E.I" series={[{data:stockData.lei.data, name:'L.E.I'}]} xaxis={stockData.lei.months}/>
         <LineChart title="Manufacturing and Services PMI" 
@@ -118,9 +133,8 @@ const Page = () =>{
             xaxis={stockData.servicespmi.months}
         />
         <LineChart series={[{data:stockData.SAHMREALTIME.data, name:'Sahm Rule Recession Indicator'}]} xaxis={stockData.SAHMREALTIME.dates} title="Sahm Rule Recession Indicator"/>
-
+ 
     </main>
 } 
-
 
  export default Page

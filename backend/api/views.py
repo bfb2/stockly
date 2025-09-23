@@ -86,7 +86,10 @@ class GatherTechinicalDetails(APIView):
         equity_data = economic_info.get_market_data()
         fred_stats = economic_info.retrieve_fred_info()
         monthly_data = Monthlyindicatordata.objects.values().first()
-        return Response({'market':equity_data, 'fred_stats':fred_stats, "stats":monthly_data}, status=status.HTTP_200_OK)
-
-
         
+        try:
+            summary = economic_info.interpret_data(fred_stats, equity_data)
+        except Exception as e:
+            summary = ('A.I summary unavailable right now','A.I summary unavailable right now')
+
+        return Response({'market':equity_data, 'fred_stats':fred_stats, "stats":monthly_data, "summary":summary}, status=status.HTTP_200_OK)        

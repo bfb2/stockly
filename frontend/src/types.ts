@@ -38,7 +38,38 @@ export interface MarketInfo {
     lei:{data:number[],months:string[]}, 
     manufacturingpmi:number[], 
     servicespmi:{data:number[],months:string[]}
+    marketSummary:string,
+    econSummary:''
 } 
+
+type Months = 'Jan'|'Feb'|'Mar'|'Apr'|'May'|'Jun'|'Jul'|'Aug'|'Sep'|'Oct'|'Nov'|'Dec' 
+export interface PortfolioSettings{
+    assets: Record<number, {ticker:string, allocations:[number, number, number], name:string}>;
+    settings: {
+        timePeriod:'Month-to-Month'|'Year-to-Year';
+        startMonth: Months
+        startYear:string;
+        startDay:string;
+        endMonth:Months;
+        endDay:string;
+        endYear:string;
+        cashflows: 'None'|'Contribute fixed amount'|'Withdraw fixed amount'|'Withdraw fixed percentage';
+        contributionAmount:number;
+        withdrawAmount:number;
+        withdrawPercentage:number;
+        frequency: 'Annually'|'Monthly'|'Quarterly'
+        initial_amount: number;
+        rebalancing: string;
+        leverage: number;
+        expenseRatio:number;
+        dividends:boolean
+    };
+}
+
+export interface PortfolioState{
+    data:PortfolioSettings;
+    temp:PortfolioSettings['assets']
+}
 
 type AnnualGrowth = Record<string, number>
 type PortfolioGrowth = Record<string ,Record<string, number>&{total:number}>

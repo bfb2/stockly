@@ -2,8 +2,7 @@ onmessage = (e) => {
     const fredData = e.data.fred_stats
     const marketData = e.data.market
     const economicStats = e.data.stats
-    const formattedData = {}
-
+    const formattedData = {marketSummary:e.data.summary[0], econSummary:e.data.summary[1]}
     
     formattedData.macd = {
         macd:Object.values(marketData.macd),
@@ -23,6 +22,9 @@ onmessage = (e) => {
 
     formattedData.volume = marketData['s&p_volume'] 
     formattedData.vix=marketData['VIX']
+    /* for (const date in marketData.rsi){
+        formattedData.rsi.push({x:date, y:marketData.rsi[date]})
+    } */
     formattedData.rsi = Object.values(marketData.rsi)
 
     for (const key in fredData){

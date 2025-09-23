@@ -2,6 +2,7 @@
 import ReactApexChart from 'react-apexcharts'
 import {ApexOptions} from 'apexcharts'
 import { MarketInfo } from '@/types'
+import Label from './Label'
 
 const MACDChart = ({data, dates=[]}:{dates:string[], data:MarketInfo['macd']}) =>{
     const {histogram, macd, signal} = data
@@ -43,11 +44,7 @@ const MACDChart = ({data, dates=[]}:{dates:string[], data:MarketInfo['macd']}) =
                         }
                     }
                   },
-                  title: {
-                    text: 'Advance / Decline Line',
-                    align: 'left',
-                    offsetX: 110
-                  },
+                  
                   xaxis: {
                     categories: dates,
                     tickAmount:25
@@ -83,8 +80,9 @@ const MACDChart = ({data, dates=[]}:{dates:string[], data:MarketInfo['macd']}) =
                   data: histogram
                 }]
     
-    return <div className="h-full">
-      <ReactApexChart options={options} series={series} type='line' height={350} width={'100%'}/>
+    return <div >
+      <Label label="Advance / Decline Line"/>
+      <ReactApexChart options={options} series={series} type='line' height={200} width={'100%'}/>
       </div>
 } 
 

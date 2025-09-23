@@ -2,8 +2,9 @@
 import ReactApexChart from 'react-apexcharts'
 import {ApexOptions} from 'apexcharts'
 import { ChartSeries } from '@/types'
+import Label from '@/app/market-indicators/_components/Label'
 
-const LineChart = ({series, xaxis, formatter, title='', row, xaxisType, tickAmount=50, yaxisFormatter}:LineChartProps) =>{
+const LineChart = ({height = 350,series, xaxis, formatter, title='', row, xaxisType, tickAmount=50, yaxisFormatter}:LineChartProps) =>{
     
 
     const options:ApexOptions = {
@@ -51,18 +52,18 @@ const LineChart = ({series, xaxis, formatter, title='', row, xaxisType, tickAmou
       }
     }
     },
-    title: {
-      text: title,
-      align: 'left',
-      offsetX: 110
-    },
+    
     yaxis:{
         labels:{
             formatter:yaxisFormatter
         }
     }
 }
-    return <ReactApexChart options={options} series={series} type='line' height={350}/>
+    return <div>
+        <Label label={title}/>
+        <ReactApexChart options={options} series={series} type='line' height={height} />
+
+    </div>
 } 
 
 interface LineChartProps{
@@ -73,7 +74,8 @@ interface LineChartProps{
     xaxis?:string[]|number[];
     xaxisType?:"category" | "datetime" | "numeric";
     tickAmount?:number;
-    yaxisFormatter?:(val: number, opts?: unknown)=> string | string[]
+    yaxisFormatter?:(val: number, opts?: unknown)=> string | string[];
+    height?:string|number
 }
 
  export default LineChart

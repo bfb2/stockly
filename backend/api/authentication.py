@@ -30,19 +30,15 @@ def decode_authjs_session(token):
         raise ValueError("AUTHJS_SALT environment variable is not set.")
     
     key_bytes = get_encryption_key(authjs_secret, authjs_salt)
-    print('the keybytes are', key_bytes)
     key = jwk.JWK(kty='oct', k=base64.urlsafe_b64encode(key_bytes).decode('utf-8'))
-    print('the key is', key)
-    try:
-        jwe_token = jwe.JWE()
-        jwe_token.deserialize(token)
-        jwe_token.decrypt(key)
-        data = jwe_token.payload
-        decoded_token = json.loads(data.decode("utf-8"))
-        return decoded_token
-    except Exception as e:
-        print(f"Error wihle decrypting, {e}" )
-        raise e
+    
+    jwe_token = jwe.JWE()
+    jwe_token.deserialize(token)
+    jwe_token.decrypt(key)
+    data = jwe_token.payload
+    decoded_token = json.loads(data.decode("utf-8"))
+    return decoded_token
+    
 
 class AuthenticateJWE(BaseAuthentication):
     def authenticate(self, request):

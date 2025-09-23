@@ -2,6 +2,7 @@
 import ReactApexChart from 'react-apexcharts'
 import {ApexOptions} from 'apexcharts'
 import { MarketInfo } from '@/types'
+import Label from './Label'
 
 const MovingAverages = ({data, stockPrices, dates}:{dates:string[],data:MarketInfo['movingAverage'], stockPrices:number[]}) =>{
     const {fiftyDay, parabolic, twoHundredDay} = data
@@ -29,11 +30,7 @@ const MovingAverages = ({data, stockPrices, dates}:{dates:string[],data:MarketIn
                   markers: {
                       size: [0, 0, 1, 0,0]
                 },
-                  title: {
-                    text: 'MACD',
-                    align: 'left',
-                    offsetX: 110
-                  },
+        
                   xaxis: {
                     categories: dates,
                     tickAmount:25
@@ -74,9 +71,11 @@ const MovingAverages = ({data, stockPrices, dates}:{dates:string[],data:MarketIn
                     data:stockPrices
                 }]
     
-        return <div className="h-full">
-          <ReactApexChart options={options} series={series} type='line' height={350} />
-          </div>
+        return <div className='row-[7-9] xl:row-[2/4] xl:col-2'>
+          <Label label='MACD'/>
+          <ReactApexChart  options={options} series={series} type='line' height={200} />
+        </div>
+        
 } 
 
 

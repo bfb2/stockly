@@ -7,7 +7,7 @@ const Modal = ({children, name, trigger, okBtnName = 'OK', formId, okBtnFN}:Prop
     const [modalActive, setModalActive] = useState(false)
     return <>
         {modalActive && 
-            <dialog className="fixed center-pos rounded-lg z-1000 min-w-[400px] min-h-[200px] bg-[#2b3755] flex flex-col text-white" onBlur={(e)=>console.log(e)}>
+            <dialog className="fixed center-pos rounded-lg z-1000 min-w-[400px] min-h-[200px] bg-[#2b3755] flex flex-col text-white">
                 <div className="text-center bg-[#3c4e76] rounded-t-lg rounded-tr-lg py-1.25 flex">
                     <span className="center-pos flex-1" >{name}</span>
                     <div onClick={()=>setModalActive(false)} className="bg-orange-600 hover:bg-orange-700 self-center mr-2.5 rounded-full cursor-pointer h-3.75 w-3.75 justify-self-end"></div>
