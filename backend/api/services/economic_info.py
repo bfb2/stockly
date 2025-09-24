@@ -91,9 +91,8 @@ class EconomicInfo():
     def interpret_data(self, fred_info, market_data):
         genai.configure(api_key=os.getenv('GEMINI_KEY'))
         model = genai.GenerativeModel('gemini-2.5-pro')
-        prompt = f"Analyze the market data and give insights on the current state of the US markets and how its trending based on the data. Here is the market data {market_data}"
+        prompt = f"Analyze the provided market data and give insights on the current state of the US markets and how its trending based on the data. Here is the market data {market_data}"
         response = model.generate_content(prompt)
-        economic_health_prompt = f"Analyze the data and give insights on the current state of the US Economy and how its trending based on the data, here's the data {fred_info}"
+        economic_health_prompt = f"Analyze the provided data and give insights on the current state of the US Economy and how its trending based on the data, here's the data {fred_info}"
         econ_response = model.generate_content(economic_health_prompt)
-        
-        return (response['candidates'][0]['content']['parts'][0].text, econ_response['candidates'][0]['content']['parts'][0].text)
+        return (response.candidates[0].content.parts[0].text, econ_response.candidates[0].content.parts[0].text)

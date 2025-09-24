@@ -69,7 +69,6 @@ class CreatePaperTradeOrder(APIView):
             ticker = request.data.get('ticker')
             qty = request.data.get('qty')
             order_type_details = request.data.get('order_type_details')
-            print('xebec')
             create_trade_order = CreateTradeOrder(order_type, side, ticker, qty, order_type_details,request.user)
             
             if side =='Buy' and not create_trade_order.sufficient_funds():
