@@ -55,7 +55,7 @@ const Page = () =>{
     },[])   
         
     return <main  className="relative xl:grid-cols-2 grid-rows-[repeat(20, minmax(0,1fr))] grid gap-x-[5px]">
-        <FullscreenLoader displaySpinner={false}/>
+        <FullscreenLoader displaySpinner={stockData.closePrices.length ==0}/>
         <div className="col-[1/-1] text-2xl font-bold w-fit relative left-[15px] mb-[15px]">Market Stats</div>
         <AISummary rowClass="row-[2/6]" summary={stockData.marketSummary}/>      
         <MovingAverages  data={stockData.movingAverage} stockPrices={stockData.closePrices} dates={stockData.dates} />

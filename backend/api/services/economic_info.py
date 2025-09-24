@@ -95,5 +95,5 @@ class EconomicInfo():
         response = model.generate_content(prompt)
         economic_health_prompt = f"Analyze the data and give insights on the current state of the US Economy and how its trending based on the data, here's the data {fred_info}"
         econ_response = model.generate_content(economic_health_prompt)
-        #print(response, 'Response')
-        return (response['result']['candidates'][0]['content']['parts'][0], econ_response['result']['candidates'][0]['content']['parts'][0])
+        
+        return (response['candidates'][0]['content']['parts'][0].text, econ_response['candidates'][0]['content']['parts'][0].text)
