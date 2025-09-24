@@ -8,7 +8,7 @@ const page = async () =>{
             headers:{
                 "Content-Type":'application/json',
             },
-            })
+        })           
     const data = await fetchRes.json()
     return <Backtrace data={data} />
 }
