@@ -8,7 +8,7 @@ import numpy as np
 import google.generativeai as genai
 from .util import retrieve_from_yf
 class EconomicInfo():
-    def retrieve_fred_info(self):
+    async def retrieve_fred_info(self):
         fred = Fred(api_key=f'{os.environ.get('FRED_KEY')}')
         end_date = datetime.today()
         start_date = end_date - timedelta(days=365)
@@ -23,7 +23,7 @@ class EconomicInfo():
             fred_stats[id] = fred_df.to_dict(orient='records')
         return fred_stats
 
-    def get_market_data(self):
+    async def get_market_data(self):
         df = yf.download(['^VIX'], period='1y', interval='1d')
         df = df.dropna(subset=[col for col in df.columns if col[0] == 'Close'])
         today = datetime.today().date()

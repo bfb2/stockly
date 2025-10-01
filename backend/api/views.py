@@ -7,6 +7,8 @@ from api.authentication import AuthenticateJWE
 from api.models import User, Monthlyindicatordata
 from .services import (TradeAccount, Backtrace, CreateTradeOrder, EconomicInfo)
 import traceback
+import asyncio
+from asgiref.sync import sync_to_async, async_to_sync
 
 # Create your views here.
 class BacktracePortfolioAPIView(APIView):
@@ -81,10 +83,16 @@ class CreatePaperTradeOrder(APIView):
 
 class GatherTechinicalDetails(APIView):
     def get(self, request):
-        economic_info = EconomicInfo()        
-        equity_data = economic_info.get_market_data()
-        fred_stats = economic_info.retrieve_fred_info()
-        monthly_data = Monthlyindicatordata.objects.values().first()
+        economic_info = EconomicInfo() 
+        async def gather_data():
+            return await asyncio.gather(
+                economic_info.get_market_data(),
+                economic_info.retrieve_fred_info(),
+                sync_to_async(
+                    lambda:Monthlyindicatordata.objects.values().first()
+                    )()
+            )
+        equity_data, fred_stats, monthly_data = async_to_sync(gather_data)()
         
         try:
             summary = economic_info.interpret_data(fred_stats, equity_data)
