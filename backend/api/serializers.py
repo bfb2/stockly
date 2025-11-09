@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import BackTracePortfolio, TradeRequest
+from .models import TradeRequest
 
 class AllocationField(serializers.ListField):
     """Parses '60,40' into [60,40]."""
@@ -39,9 +39,9 @@ class BacktracePortfolioSerialzer(serializers.Serializer):
     ]
     cashflows = serializers.ChoiceField(choices=CASHFLOW_CHOICES, default='None')
 
-    contribution_amount = serializers.IntegerField(min_value=0, default=0)
-    withdraw_amount = serializers.IntegerField(min_value=0, default=0)
-    withdraw_pct = serializers.IntegerField(min_value=0, max_value=100, default=0)
+    contribution_amount = serializers.FloatField(min_value=0.0, default=0.0)
+    withdraw_amount = serializers.FloatField(min_value=0.0, default=0.0)
+    withdraw_pct = serializers.FloatField(min_value=0.0, max_value=100.00, default=0.0)
 
     FREQUENCY_CHOICES = [
         ('Annually', 'Annually'),
@@ -75,7 +75,6 @@ class BacktracePortfolioSerialzer(serializers.Serializer):
 
         for portfolio_num in range(3):
             portfolio_allocation_total = sum(ticker_allocations[portfolio_num] for ticker_allocations in data['allocations'])
-            print(portfolio_allocation_total, portfolio_num, data['allocations'], 'cmonnn manennn')
             if portfolio_allocation_total > 0 and portfolio_allocation_total < 100 :
                 print(portfolio_num, portfolio_allocation_total)
                 raise serializers.ValidationError(
