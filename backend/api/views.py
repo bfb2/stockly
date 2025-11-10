@@ -13,6 +13,7 @@ from asgiref.sync import sync_to_async, async_to_sync
 # Create your views here.
 class BacktracePortfolioAPIView(APIView):
     def get(self, request):
+        print('accessed route backtrace')
         serializer = BacktracePortfolioSerialzer(data = request.query_params)
         if serializer.is_valid():
             data = serializer.validated_data
