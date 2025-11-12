@@ -16,7 +16,7 @@ class AllocationField(serializers.ListField):
 class BacktracePortfolioSerialzer(serializers.Serializer):
     start_date = serializers.DateField()
     end_date = serializers.DateField()
-    initial_amount = serializers.IntegerField(min_value=1)
+    initial_amount = serializers.FloatField(min_value=0.1, default=1.0)
 
     REBALANCING_CHOICES = [
         ('No Rebalancing', 'No Rebalancing'),
