@@ -4,7 +4,7 @@ import { PaperTradeAccInfo } from '@/types'
 
 const page = async () =>{
     const headerStore = await headers()
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/proxy/paper-trade`,{
+    const res = await fetch('https://stockly-beryl-zeta.vercel.app/api/proxy/paper-trade',{
         cache:'no-store',
         headers:{
             cookie:headerStore.get('cookie')|| ''
