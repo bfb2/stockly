@@ -106,7 +106,7 @@ class Backtrace():
                                     self.stats[portfolio_num]['shares'][ticker] += shares
                             case 'Withdraw fixed percentage':
                                 if action_day:
-                                    withdraw = ((100-float(self.withdraw_pct))/100)*(allocation/100)
+                                    withdraw = (float(self.withdraw_pct)/100)*(allocation/100)
                                     amount_withdrawn = self.portfolio_growth[portfolio_num][stock_date][ticker] * withdraw
                                     current_price = stock_data.loc[date_to_check, ("Close", ticker)]
                                     shares = amount_withdrawn / current_price
