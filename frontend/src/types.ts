@@ -3,7 +3,8 @@ type Stats = {
     end:string|number;
     max:string|number;
     peak_date:string;
-    bottom_date:string
+    bottom_date:string;
+    withdraws:Record<string, number>
 }
 
 export type FredData = {data:number[], dates:string[]}

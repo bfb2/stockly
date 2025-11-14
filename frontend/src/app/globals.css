@@ -131,6 +131,7 @@
     top: 50%;
     transform: translateY(-50%);
     justify-self: center;
+    position: relative;
   }
 }
 

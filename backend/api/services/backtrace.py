@@ -27,9 +27,9 @@ class Backtrace():
         self.portfolio_annual ={'years':OrderedSet(), 'data':[{},{},{}]}
         self.portfolio_growth = [{},{},{}]
         self.stats = [
-            {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}},
-            {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}},
-            {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}}
+            {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}, 'withdraws':{}},
+            {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}, 'withdraws':{}},
+            {'cagr':'-', 'end':'-','max':'-','peak_date':'', 'bottom_date':'', 'shares':{}, 'divs':{}, 'excess cash':{}, 'withdraws':{}}
         ]
 
         for index, ticker in enumerate(tickers):
@@ -113,6 +113,7 @@ class Backtrace():
                                     self.portfolio_growth[portfolio_num][stock_date]['total'] -= amount_withdrawn
                                     self.portfolio_growth[portfolio_num][stock_date][ticker] -= amount_withdrawn
                                     self.stats[portfolio_num]['shares'][ticker]-= shares
+                                    self.stats[portfolio_num]['withdraws'][stock_date[:4]] = self.stats[portfolio_num]['withdraws'].get(stock_date[:4],0) + amount_withdrawn
                             case 'Withdraw fixed amount':
                                 if action_day:
                                     withdraw = float(self.withdraw_amount)*(allocation/100)
