@@ -11,7 +11,9 @@ const MACDChart = ({data, dates=[]}:{dates:string[], data:MarketInfo['macd']}) =
                     type:'line',
                     height:350,
                     zoom:{
-                        enabled:true
+                        enabled:true,
+                        type:'x',
+                        autoScaleYaxis:true
                     },
                     
                     toolbar:{

@@ -12,7 +12,9 @@ const LineChart = ({height = 350,series, xaxis, formatter, title='', row, xaxisT
         type:'line',
         height:350,
         zoom:{
-            enabled:true
+            enabled:true,
+            type:'x',
+            autoScaleYaxis:true
         },
         toolbar:{
             show:false
@@ -43,14 +45,14 @@ const LineChart = ({height = 350,series, xaxis, formatter, title='', row, xaxisT
         categories:xaxis,
         type:xaxisType,
         tickAmount,
-    labels: {
-      datetimeFormatter: {
-        year: "yyyy-MM-dd",   
-        month: "yyyy-MM-dd",
-        day: "yyyy-MM-dd",
-        hour: "yyyy-MM-dd HH:mm"
-      }
-    }
+        labels:{
+            datetimeFormatter: {
+                year: "yyyy-MM-dd",   
+                month: "yyyy-MM-dd",
+                day: "yyyy-MM-dd",
+                hour: "yyyy-MM-dd HH:mm"
+            },
+        }
     },
     
     yaxis:{

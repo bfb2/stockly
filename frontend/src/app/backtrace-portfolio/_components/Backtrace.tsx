@@ -27,6 +27,24 @@ const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
         )})
     })
 
+    const withdrawals:ChartSeries[] = []
+    growthData?.stats.forEach(({withdraws}, index) => {
+        if(withdraws == undefined)
+            return
+        const years = Object.keys(withdraws)
+        if(years.length != 0)
+            withdrawals.push(
+            {
+                name:`Portfolio ${index+1}`, 
+                data: years.map(year=> (
+                    {
+                        x:year, 
+                        y:withdraws[year]
+                    }
+                ))
+            })
+    })
+
     const dates = Object.keys(growthData?.growth[0]||{})
     const [loading, setLoading] = useState(false)
     return <main className="relative">
@@ -99,6 +117,13 @@ const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
             <div className="font-semibold text-2xl my-4">Portfolio Growth</div>
             <LineChart series={portfolioGrowth} xaxisType="datetime" xaxis={dates} row={rowOptions} formatter={(val)=>`$${formatMoney(val)}`} yaxisFormatter={(val)=>`$${formatMoney(val)}`}/>
         </section>
+        {
+            withdrawals.length > 0 &&
+            <section>
+                <div className="font-semibold text-2xl myw-4">Annual Withdrawals</div>
+                <LineChart series={withdrawals} xaxis={growthData?.annual.years} xaxisType="category" row={rowOptions} yaxisFormatter={(val)=>`$${formatMoney(val)}`} tickAmount={growthData?.annual&&growthData.annual.years.length-1}/>
+            </section>
+        }
         <section>
             <div className="font-semibold text-2xl myw-4">Annual Returns</div>
             <BarChart series={barChartSeries}  xaxisType="numeric" xaxis={growthData?.annual.years} xaxisFormatter={(val) => Number(val).toFixed(0) } formatter={(val)=>`${val}%`}/>

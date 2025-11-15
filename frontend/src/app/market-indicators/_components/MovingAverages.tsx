@@ -13,8 +13,10 @@ const MovingAverages = ({data, stockPrices, dates}:{dates:string[],data:MarketIn
                     type:'line',
                     height:350,
                     zoom:{
-                        enabled:true
-                    },                    
+                        enabled:true,
+                        type:'x',
+                        autoScaleYaxis:true
+                    },                   
                     toolbar:{
                         show:false
                     },
