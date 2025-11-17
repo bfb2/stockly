@@ -9,7 +9,8 @@ const page = async () =>{
                 "Content-Type":'application/json',
             },
         })           
-    const data = await fetchRes.json()
+    const res = await fetchRes.json() 
+    const data = typeof(res) == 'object' ? {...res, starting:10000} : {error:'Failed fetching data, refresh the page and try again'}
     return <Backtrace data={data} />
 }
  export default page

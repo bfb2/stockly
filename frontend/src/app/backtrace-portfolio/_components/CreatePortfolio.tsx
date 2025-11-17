@@ -4,13 +4,13 @@ import Modal from "@/components/Modal"
 import {useState} from 'react'
 import Button from "@/components/Button"
 import React from "react"
-import { ReturnedPortfolioData, PortfolioState, PortfolioSettings } from "@/types"
+import { ReturnedPortfolioData, PortfolioState, PortfolioSettings, ReturnedData } from "@/types"
 import ConfigurePortfolio from "./ConfigurePortfolio"
 import { months } from "@/constants"
 
 type Asset = {ticker:string; allocation:number;name:string}
 
-const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:ReturnedPortfolioData)=>void, setLoading:(state:boolean)=>void}) =>{
+const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:ReturnedData)=>void, setLoading:(state:boolean)=>void}) =>{
     const year = new Date().getFullYear()
     const [portfolioSettings, setPortfolioSettings] = useState<PortfolioState>({
         data:{
@@ -81,52 +81,73 @@ const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:Return
          fetch(`https://stockly-fvoz.onrender.com/backtrace-portfolio?start_date=${startYear}-${startMonthNum}-01&end_date=${endYear}-${endMonthNum}-${findLastDay(endYear, Number(endMonthNum))}&initial_amount=${initial_amount}&rebalancing=${rebalancing}&leverage=${leverage}&${tickers}${allocationsUrl}frequency=${frequency}&cashflows=${cashflows}&contribution_amount=${contributionAmount}&withdraw_amount=${withdrawAmount}&withdraw_pct=${withdrawPercentage}&reinvest_dividends=${dividends}&expense_ratio=${expenseRatio}`, {
             method:'GET',
             headers:{"Content-Type":'application/json'},
-        }).then(res => res.json()).then((portfolios:ReturnedPortfolioData)=> {
+        }).then(res => res.json()).then((portfolios:ReturnedPortfolioData|string)=> {
                 setLoading(false)
-                setGrowthData({
+                const retrievedData = typeof(portfolios) == 'object'
+                const data = retrievedData? 
+                {
                     growth:portfolios.growth, 
                     stats:portfolios.stats, 
                     annual:portfolios.annual,
                     starting:portfolioSettings.data.settings.initial_amount
-                })
-                setPortfolioSettings(prev => ({...prev, data:{...prev.data, assets:prev.temp}}))      
+                } 
+                : 
+                {error: 'Failed fetching data, please try again'}
+                
+                setGrowthData(data)
+                if(retrievedData)
+                    setPortfolioSettings(prev => ({...prev, data:{...prev.data, assets:prev.temp}}))      
         }) 
     }
 
     const portfolioData = returnPortfolioAssetsAndAllocations(portfolioSettings.data.assets)
     
     return <section>
-        {portfolioData.map((data, index) => data.length >0 && <React.Fragment key={index}>
-            <div>
-                <div className="font-semibold text-2xl my-4">Portfolio #{index+1}</div>
-                <div className="flex">
-                    <div className="basis-[60%]">    
-                        <table className="w-full" key={crypto.randomUUID()}>
-                            <thead className="border-1 border-b-gray-600">
-                                <tr className="*:text-left *:last:text-right">
-                                    <th>Ticker</th>
-                                    <th>Name</th>
-                                    <th>Allocation</th>
-                                </tr>
-                            </thead>
-                            <tbody className="[&>*:nth-child(odd)]:bg-[#344365]">
-                                {
-                                    data.map(asset => 
-                                    <tr key={asset.ticker} className="*:text-left *:last:text-right border-1 border-b-gray-300">
-                                        <td>{asset.ticker}</td>
-                                        <td>{asset.name}</td>
-                                        <td>{asset.allocation}%</td>
-                                    </tr>)
-                                }
-                            </tbody>
-                        </table>    
-                    </div>
-                <div className="ml-auto mr-auto">
-                    <PieChart key={data.map(data => data.ticker).join(',')} labels={data.map(data => data.ticker)} items={data.map(data => data.allocation)}/>
-                </div>
-                </div>
-            </div>
-        </React.Fragment>)}
+        {
+            portfolioData.map((portfolio, index) => {
+                if(portfolio.length >0){
+                    let key = ''
+                    const labels:string[] = []
+                    const items:number[] = []
+                    portfolio.forEach(asset => {
+                        key += `${asset.ticker} ${asset.allocation}`
+                        labels.push(asset.ticker)
+                        items.push(asset.allocation)
+                    })
+                    return <React.Fragment key={key}>
+                        <div>
+                            <div className="font-semibold text-2xl my-4">Portfolio #{index+1}</div>
+                            <div className="flex">
+                                <div className="basis-[60%]">    
+                                    <table className="w-full">
+                                        <thead className="border-1 border-b-gray-600">
+                                            <tr className="*:text-left *:last:text-right">
+                                                <th>Ticker</th>
+                                                <th>Name</th>
+                                                <th>Allocation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="[&>*:nth-child(odd)]:bg-[#344365]">
+                                            {
+                                                portfolio.map(asset => 
+                                                <tr key={asset.ticker} className="*:text-left *:last:text-right border-1 border-b-gray-300">
+                                                    <td>{asset.ticker}</td>
+                                                    <td>{asset.name}</td>
+                                                    <td>{asset.allocation}%</td>
+                                                </tr>)
+                                            }
+                                        </tbody>
+                                    </table>    
+                                </div>
+                            <div className="ml-auto mr-auto">
+                                <PieChart key={key} labels={labels} items={items}/>
+                            </div>
+                            </div>
+                        </div>
+                    </React.Fragment>
+                }
+            })
+        }
             <div className="mt-2.5">
                 <Modal okBtnFN={retrieveGrowthData} formId="portfolio-settings" name="Portfolio Configuration"
                     trigger={<Button name="Edit Portfolio" type="button" extraClass={{base:"py-[5px] px-[10px] border-1 border-white hover:bg-white hover:text-[#1f283d]"}}/>} 

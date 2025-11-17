@@ -2,15 +2,24 @@
 import LineChart from "@/components/LineChart"
 import BarChart from "@/components/BarChart"
 import CreatePortfolio from "./CreatePortfolio"
-import { JSX, useState } from "react"
-import { ReturnedPortfolioData, ChartSeries } from "@/types"
+import React, { JSX, useState } from "react"
+import { ReturnedPortfolioData, ChartSeries, ReturnedData } from "@/types"
 import { formatMoney } from "@/functions/format-money"
 import FullscreenLoader from "@/components/FullscreenLoader"
+import ErrorMsg from "@/components/ErrorMsg"
 
-const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
+const Backtrace = ({data}:{data:ReturnedData}) =>{
+    const [errorMsg, setErrorMsg] = useState<string>()
+
     const [growthData, setGrowthData] = useState<ReturnedPortfolioData>()
-    if(growthData == undefined)
-        setGrowthData({...data, starting:10000})
+    const updateGrowthData = (data:ReturnedData) => {
+        if (isReturnedPortfolioData(data))
+            return setGrowthData(data)
+        setErrorMsg(data.error)
+    }
+
+    if(growthData == undefined && errorMsg == undefined)
+        updateGrowthData(data)
     
     const portfolioGrowth:ChartSeries[] = [] 
     growthData?.growth.forEach((data,index) =>{
@@ -20,15 +29,52 @@ const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
     } ) 
 
     const barChartSeries:ChartSeries[] = []
+    const bestYears:JSX.Element[] =[]
+    const worstYears:JSX.Element[] = []
     growthData?.annual.data.forEach((annualReturns,index) => {
         const years = Object.keys(annualReturns)
         if(years.length != 0)
             barChartSeries.push({name:`Portfolio ${index+1}`, data:years.map(year => ({x:Number(year), y:annualReturns[year]})
         )})
+
+        const returns = Object.values(annualReturns)
+        const bestYear = returns.length > 0 ? `${Math.max(...returns)}%` : '-'
+        bestYears.push(<td key={`${bestYear}${index}`}>{bestYear}</td>)
+
+        const worstYear = returns.length > 0 ? `${Math.min(...returns)}%` : '-'
+        worstYears.push(<td key={`${worstYear}${index}`}>{worstYear}</td>)
     })
 
     const withdrawals:ChartSeries[] = []
-    growthData?.stats.forEach(({withdraws}, index) => {
+    const startBalance: React.JSX.Element[] =[]
+    const endBalance: React.JSX.Element[] = []
+    const annualizedReturns:React.JSX.Element[] = []
+    const drawdown:JSX.Element[] = []
+    growthData?.stats.forEach(({withdraws, end, cagr, max}, index) => {
+        startBalance.push(
+            <td key={`${growthData.starting}${index}`}>
+                {
+                    typeof(end) == 'number' ? 
+                    '$'+growthData.starting.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+                    : '-'
+                }
+            </td>
+        )
+
+        endBalance.push(
+            <td key={`${end}${index}`}>{
+                typeof(end) == 'number' ? 
+                    `$${end.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+                    : '-'
+            }</td>
+        )
+
+        annualizedReturns.push(<td key={`${cagr}${index}`}>
+                                    {typeof(cagr) == 'number' ? `${cagr.toFixed(2)}%`: '-'}
+                                </td>)
+
+        drawdown.push(<td key={`${max}${index}`}>{typeof(max) == 'number' ? `${max.toFixed(2)}%` : '-'}</td>)
+
         if(withdraws == undefined)
             return
         const years = Object.keys(withdraws)
@@ -49,7 +95,8 @@ const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
     const [loading, setLoading] = useState(false)
     return <main className="relative">
         <FullscreenLoader displaySpinner={loading}/>
-        <CreatePortfolio  setGrowthData={setGrowthData} setLoading={(state:boolean)=>setLoading(state)}/>
+        {errorMsg && <ErrorMsg msg={errorMsg}/>}
+        <CreatePortfolio setGrowthData={updateGrowthData} setLoading={(state:boolean)=>setLoading(state)}/>
         <section>
             <div className="font-semibold text-2xl my-4">Performance Summary</div>
             <table className="border-1 border-gray-400 w-[90%] justify-self-center ml-auto mr-auto">
@@ -67,37 +114,31 @@ const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
                     <TableRow>
                         <>
                             <td>Start Balance</td>
-                            {growthData?.stats.map((data) => <td key={crypto.randomUUID()}>{typeof(data.end) == 'number' ? '$'+growthData.starting.toLocaleString(): '-'}</td>)?? placeholder}
+                            {startBalance.length != 0 ? startBalance: placeholder}
                         </> 
                     </TableRow>
                     <TableRow>
                         <>
                             <td>End Balance</td>
-                            {growthData?.stats.map(data => <td key={crypto.randomUUID()}>{typeof(data.end) == 'number' ? '$'+data.end.toLocaleString(): '-'}</td>)?? placeholder}
+                            {endBalance.length!=0? endBalance: placeholder}
                         </>      
                     </TableRow>
                     <TableRow>
                         <>
                             <td>Annualized Return</td>
-                            {growthData?.stats.map(data => <td key={crypto.randomUUID()}>{typeof(data.cagr) == 'number' ? data.cagr.toFixed(2)+'%': '-'}</td>)?? placeholder}
+                            {annualizedReturns.length!= 0? annualizedReturns: placeholder}
                         </>
                     </TableRow>
                     <TableRow>
                         <>
                             <td>Best Year</td>
-                            {growthData?.annual.data.map(data => {
-                                const annualData = Object.values(data)
-                                return <td key={crypto.randomUUID()}>{annualData.length !== 0 ? Math.max(...annualData)+'%': '-'}</td>
-                            })?? placeholder}
+                            {bestYears.length!=0? bestYears: placeholder}
                         </>
                     </TableRow>
                     <TableRow>
                         <>
                             <td>Worst Year</td>
-                            {growthData?.annual.data.map(data => {
-                                const annualData = Object.values(data)
-                                return <td key={crypto.randomUUID()}>{annualData.length !== 0 ? Math.min(...annualData)+'%': '-'}</td>
-                            }) ?? placeholder}
+                            {worstYears.length!=0? worstYears: placeholder}
                         </>
                     </TableRow>
                     <TableRow>
@@ -105,8 +146,7 @@ const Backtrace = ({data}:{data:Omit<ReturnedPortfolioData,'starting'>}) =>{
                             <td>
                                 Maximum Drawdown
                             </td>
-                            {growthData?.stats.map(data => <td key={crypto.randomUUID()}>{typeof(data.max) == 'number' ? data.max.toFixed(2)+'%' : '-'}</td>)?? placeholder}
-                            
+                            {drawdown.length!= 0 ? drawdown:placeholder}
                         </>
                         
                     </TableRow>
@@ -142,5 +182,9 @@ const rowOptions = {
     opacity: 0.5
 }
 
+
+function isReturnedPortfolioData(data:ReturnedData): data is ReturnedPortfolioData{
+    return 'annual' in data
+}
 
  export default Backtrace

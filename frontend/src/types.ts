@@ -83,6 +83,7 @@ export interface ReturnedPortfolioData{
     stats:[Stats, Stats, Stats];
     starting:number
 }
+export type ReturnedData = ReturnedPortfolioData|{error:string}
 
 export type ChartSeries = {name:string, data:{x:string|number, y:number}[]|number[]}
 
