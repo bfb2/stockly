@@ -13,8 +13,11 @@ const Backtrace = ({data}:{data:ReturnedData}) =>{
 
     const [growthData, setGrowthData] = useState<ReturnedPortfolioData>()
     const updateGrowthData = (data:ReturnedData) => {
-        if (isReturnedPortfolioData(data))
+        if (isReturnedPortfolioData(data)){
+            setErrorMsg(undefined)
             return setGrowthData(data)
+        }
+            
         setErrorMsg(data.error)
     }
 
