@@ -83,7 +83,7 @@ const CreatePortfolio = ({setGrowthData, setLoading}:{setGrowthData:(data:Return
             headers:{"Content-Type":'application/json'},
         }).then(res => res.json()).then((portfolios:ReturnedPortfolioData|string)=> {
                 setLoading(false)
-                const retrievedData = typeof(portfolios) == 'object'
+                const retrievedData = typeof(portfolios) == 'object' && 'annual' in portfolios
                 const data = retrievedData? 
                 {
                     growth:portfolios.growth, 

@@ -29,7 +29,7 @@ class BacktracePortfolioSerialzer(serializers.Serializer):
         choices=REBALANCING_CHOICES, default='No Rebalancing'
     )
 
-    leverage = serializers.IntegerField(default=1)
+    leverage = serializers.FloatField(default=1.0, min_value=0.0)
 
     CASHFLOW_CHOICES = [
         ('None', 'None'),
@@ -67,7 +67,6 @@ class BacktracePortfolioSerialzer(serializers.Serializer):
         if data['end_date'] < data['start_date']:
             raise serializers.ValidationError("end_date must be after start_date")
 
-        # tickers vs allocations length check
         if len(data['tickers']) != len(data['allocations']):
             raise serializers.ValidationError(
                 "Number of tickers must equal number of allocations arrays."
