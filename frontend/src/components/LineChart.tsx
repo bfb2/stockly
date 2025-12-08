@@ -61,11 +61,10 @@ const LineChart = ({height = 350,series, xaxis, formatter, title='', row, xaxisT
         }
     }
 }
-    return <div>
+    return <>
         <Label label={title}/>
-        <ReactApexChart options={options} series={series} type='line' height={height} />
-
-    </div>
+        <ReactApexChart options={options} series={series} type='line' height={height} width={'100%'}/>
+    </>
 } 
 
 interface LineChartProps{
