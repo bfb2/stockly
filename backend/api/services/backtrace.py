@@ -60,6 +60,7 @@ class Backtrace():
             last_date = None
             for date in percent_change.index:
                 stock_date = str(date).split()[0]
+                stock_month = stock_date[5:7]
                 date_to_check = pd.to_datetime(date)   
                 self.portfolio_annual['years'].add(stock_date[:4])
                 for ticker, allocation in portfolio.items():
@@ -83,7 +84,6 @@ class Backtrace():
                     amount = amount if amount > 0 else 0
                     self._add_to_portfolio_growth(portfolio_num, stock_date, ticker, amount)
                     
-                   
                     #dividends
                     if not self.reinvest_dividends: 
                         div_amount = stock_dividends.loc[date_to_check, ticker]
@@ -91,7 +91,6 @@ class Backtrace():
                             cash_recieved = div_amount * self.stats[portfolio_num]['shares'][ticker]
                             self.stats[portfolio_num]['divs'][ticker] = self.stats[portfolio_num]['divs'].get(ticker, 0)+cash_recieved
                     
-                    stock_month = stock_date[5:7]
                     #cashflows
                     if date_to_check in first_open_days.index:
                         action_day = (self.frequency == 'Annually' and stock_month == '01') or (self.frequency == 'Monthly') or (self.frequency == 'Quarterly' and (stock_month == '01' or stock_month == '04' or stock_month == '07' or stock_month == '10'))    
@@ -106,8 +105,7 @@ class Backtrace():
                                     self.stats[portfolio_num]['shares'][ticker] += shares
                             case 'Withdraw fixed percentage':
                                 if action_day:
-                                    withdraw = (float(self.withdraw_pct)/100)*(allocation/100)
-                                    amount_withdrawn = self.portfolio_growth[portfolio_num][stock_date][ticker] * withdraw
+                                    amount_withdrawn = self.portfolio_growth[portfolio_num][stock_date][ticker] * (float(self.withdraw_pct)/100)
                                     current_price = stock_data.loc[date_to_check, ("Close", ticker)]
                                     shares = amount_withdrawn / current_price
                                     self.portfolio_growth[portfolio_num][stock_date]['total'] -= amount_withdrawn
@@ -122,16 +120,15 @@ class Backtrace():
                                     self.stats[portfolio_num]['shares'][ticker]-= shares
                                     self.portfolio_growth[portfolio_num][stock_date]['total'] -= withdraw
                                     self.portfolio_growth[portfolio_num][stock_date][ticker] -= withdraw
-                        
                 last_date = stock_date
-                if date_to_check in first_open_days.index and ((self.rebalancing == 'Rebalance annually' and stock_month == '01') or (self.rebalancing == 'Rebalance semi-annually' and (stock_month == '01' or stock_month == '07' )) or (self.rebalancing == 'Rebalance quarterly' and (stock_month == '03'  or stock_month == '06'  or stock_month == '09' or stock_month == '12' )) or self.rebalancing == 'Rebalance monthly'):
+                if self.rebalancing != 'No Rebalancing' and date_to_check in first_open_days.index and ((self.rebalancing == 'Rebalance Annually' and stock_month == '01') or (self.rebalancing == 'Rebalance Semi-Annually' and (stock_month == '01' or stock_month == '07' )) or (self.rebalancing == 'Rebalance Quarterly' and (stock_month == '03'  or stock_month == '06'  or stock_month == '09' or stock_month == '12' )) or self.rebalancing == 'Rebalance Monthly'):
                     for ticker, allocation in portfolio.items():
                         current_amount = self.portfolio_growth[portfolio_num][stock_date][ticker]
                         rebalanced_amount = self.portfolio_growth[portfolio_num][stock_date]['total'] * (allocation/100) 
                         current_price = stock_data.loc[date_to_check, ("Close", ticker)]
                         shares = (current_amount - rebalanced_amount)/current_price
-                        self.stats[portfolio_num]['shares'] -= shares
-                        self.portfolio_growth[portfolio_num][stock_date][ticker] = rebalanced_amount#round(rebalanced_amount,2)
+                        self.stats[portfolio_num]['shares'][ticker] -= shares
+                        self.portfolio_growth[portfolio_num][stock_date][ticker] = rebalanced_amount #round(rebalanced_amount,2)
 
         self.portfolio_annual['years'] = list(self.portfolio_annual['years'])  
         
